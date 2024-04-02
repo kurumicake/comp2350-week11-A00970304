@@ -6,8 +6,9 @@ console.log(`is_render: ${is_render}`);
 
 const mongoURI = is_render ? renderURI : localURI;
 const database = new MongoClient(mongoURI, {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true, 
+    // useNewUrlParser: true, 
+    // useUnifiedTopology: true, 
+    serverApi: ServerApiVersion.v1,
     ssl: is_render 
 });
 console.log(`Connecting to MongoDB with URI: ${mongoURI}`);
