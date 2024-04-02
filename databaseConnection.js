@@ -6,7 +6,7 @@ const localURI = "mongodb://127.0.0.1/?authSource=admin&retryWrites=true&w=major
 console.log(`is_render: ${is_render}`);
 
 // Choose the URI based on the value of is_render
-const mongoURI = is_render ? renderURI : localURI;
+const mongoURI = is_render ? localURI : renderURI;
 // Use SSL if connecting to the Render URI
 const sslOption = is_render;
 const database = new MongoClient(mongoURI, {
