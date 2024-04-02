@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
     console.log("page hit");
     try {
         // Assuming `database` is a MongoClient that has been connected properly.
-        const userCollection = database.db('lab_example').collection('users');
+        const userCollection = database.db('cluster0').collection('users');
         
         // Try to fetch all documents from 'users' collection.
         const users = await userCollection.find({}).toArray();
@@ -101,7 +101,7 @@ router.get('/deleteUser', async (req, res) => {
 			// Convert string ID to a MongoDB ObjectId
 			const objectId = new ObjectId(userId);
 			// Delete the user with the given ObjectId
-			const result = await database.db('lab_example').collection('users').deleteOne({ _id: objectId });
+			const result = await database.db('cluster0').collection('users').deleteOne({ _id: objectId });
 			console.log("deleteUser result: ", result);
 		}
 		res.redirect("/");
@@ -130,7 +130,7 @@ router.post('/addUser', async (req, res) => {
 		};
 
 		// Insert the new user into the MongoDB collection
-		const result = await database.db('lab_example').collection('users').insertOne(newUser);
+		const result = await database.db('cluster0').collection('users').insertOne(newUser);
 		console.log("addUser result: ", result);
 		res.redirect("/");
 	}
