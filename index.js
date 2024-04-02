@@ -15,16 +15,6 @@ const router = include('routes/router');
 
 const port = process.env.PORT || 3000;
 
-// database.connect((err, dbConnection) => {
-// 	if (!err) {
-// 		console.log("Successfully connected to MongoDB");
-// 	}
-// 	else {
-// 		console.log("Error Connecting to MongoDB");
-// 		console.log(err);
-// 	}
-// });
-
 async function connectToMongo() {
 	try {
 	  await database.connect();
