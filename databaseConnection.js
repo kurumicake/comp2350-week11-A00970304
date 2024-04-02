@@ -4,7 +4,7 @@ const MongoClient = require("mongodb").MongoClient;
 const is_render = process.env.IS_RENDER === 'true';
 
 // Ensure the correct URI is selected based on the environment
-const mongoURI = is_render ? renderURI : localURI;
+const mongoURI = is_render ? localURI : renderURI;
 
 // Logging for debugging
 console.log(`is_render: ${is_render}`);
