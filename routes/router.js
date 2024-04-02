@@ -43,7 +43,7 @@ router.get('/pets', async (req, res) => {
 	
 	try {
 		const petCollection = database.db('lab_example').collection(pets);
-		const pets = await petCollection()
+		const pets = await petCollection.find({ "_id": ObjectId("606e98ba4526b5d688a88c0f") })
 		const validationResult = schema.validate(req.query.id);
 		if (validationResult.error != null) {
 			console.log(validationResult.error);
@@ -94,52 +94,45 @@ router.get('/deleteUser', async (req, res) => {
 		let userId = req.query.id;
 		if (userId) {
 			console.log("userId: " + userId);
-			let deleteUser = await userModel.findByPk(userId);
-			console.log("deleteUser: ");
-			console.log(deleteUser);
-			// if (deleteUser !== null) {
-			// 	await deleteUser.destroy();
-			// }
+			// Convert string ID to a MongoDB ObjectId
+			const objectId = new ObjectId(userId);
+			// Delete the user with the given ObjectId
+			const result = await database.db('cluster0').collection('users').deleteOne({ _id: objectId });
+			console.log("deleteUser result: ", result);
 		}
 		res.redirect("/");
 	}
 	catch (ex) {
+		console.log("Error connecting to MongoDB", ex);
 		res.render('error', { message: 'Error connecting to MongoDB' });
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
 	}
 });
 
 router.post('/addUser', async (req, res) => {
-
 	try {
 		console.log("form submit");
 
-		const password_salt = crypto.createHash('sha512');
+		// Create password salt and hash
+		const password_salt = crypto.createHash('sha512').update(uuid()).digest('hex');
+		const password_hash = crypto.createHash('sha512').update(req.body.password + passwordPepper + password_salt).digest('hex');
 
-		password_salt.update(uuid());
+		// Create a new user object
+		let newUser = {
+			first_name: req.body.first_name,
+			last_name: req.body.last_name,
+			email: req.body.email,
+			password_salt: password_salt,
+			password_hash: password_hash
+		};
 
-		const password_hash = crypto.createHash('sha512');
-
-		password_hash.update(req.body.password + passwordPepper + password_salt);
-
-
-		let newUser = userModel.build(
-			{
-				first_name: req.body.first_name,
-				last_name: req.body.last_name,
-				email: req.body.email,
-				password_salt: password_salt.digest('hex'),
-				password_hash: password_hash.digest('hex')
-			}
-		);
-		// await newUser.save();
+		// Insert the new user into the MongoDB collection
+		const result = await database.db('yourDatabaseName').collection('users').insertOne(newUser);
+		console.log("addUser result: ", result);
 		res.redirect("/");
 	}
 	catch (ex) {
+		console.log("Error connecting to MongoDB", ex);
 		res.render('error', { message: 'Error connecting to MongoDB' });
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
 	}
 });
 
