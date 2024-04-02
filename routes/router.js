@@ -20,16 +20,13 @@ router.get('/', async (req, res) => {
     console.log("page hit");
     try {
         // Assuming `database` is a MongoClient that has been connected properly.
-        const userCollection = database.db('cluster0').collection('users');
+        const userCollection = database.db('lab_example').collection('users');
         
         // Try to fetch all documents from 'users' collection.
         const users = await userCollection.find({}).toArray();
         
-        // Logging the output to debug.
         console.log("Fetched users:", users);
         
-        // If users is an empty array, it means no users are found in the database.
-        // It doesn't necessarily indicate a failure.
         res.render('index', { allUsers: users });
     } catch (ex) {
         // Logging the error to the console.
