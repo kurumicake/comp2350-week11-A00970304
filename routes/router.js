@@ -17,24 +17,32 @@ const { v4: uuid } = require('uuid');
 const passwordPepper = "SeCretPeppa4MySal+";
 
 router.get('/', async (req, res) => {
-	console.log("page hit");
-	try {
-		const userCollection = database.db('lab_example').collection('users');
-		const users = await userCollection.find().project({ first_name: 1, last_name: 1, email: 1, _id: 1 }).toArray(); //{where: {web_user_id: 1}}
-		if (users === null) {
-			res.render('error', { message: 'Error connecting to MongoDB' });
-			console.log("Error connecting to userModel");
-		}
-		else {
-			console.log(users);
-			res.render('index', { allUsers: users });
-		}
-	}
-	catch (ex) {
-		res.render('error', { message: 'Error connecting to MongoDB' });
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
-	}
+    console.log("page hit");
+    try {
+        // Ensure 'database' is connected before this point.
+        const userCollection = database.db('lab_example').collection('users');
+        const users = await userCollection.find({}, {
+            projection: {
+                first_name: 1,
+                last_name: 1,
+                email: 1,
+                _id: 1
+            }
+        }).toArray();
+        
+        // Since `find().toArray()` returns an empty array if no documents are found,
+        // the condition can simply check if the array is empty
+        if (users.length === 0) {
+            console.log("No users found");
+            res.render('error', { message: 'No users found in MongoDB' });
+        } else {
+            console.log(users);
+            res.render('index', { allUsers: users });
+        }
+    } catch (ex) {
+        console.error("Error connecting to MongoDB", ex);
+        res.render('error', { message: 'Error connecting to MongoDB' });
+    }
 });
 
 router.get('/pets', async (req, res) => {
