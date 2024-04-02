@@ -19,81 +19,77 @@ const passwordPepper = "SeCretPeppa4MySal+";
 router.get('/', async (req, res) => {
     console.log("page hit");
     try {
-        // Ensure 'database' is connected before this point.
+        // Assuming `database` is a MongoClient that has been connected properly.
         const userCollection = database.db('lab_example').collection('users');
-        const users = await userCollection.find({}, {
-            projection: {
-                first_name: 1,
-                last_name: 1,
-                email: 1,
-                _id: 1
-            }
-        }).toArray();
         
-        // Since `find().toArray()` returns an empty array if no documents are found,
-        // the condition can simply check if the array is empty
-        if (users.length === 0) {
-            console.log("No users found");
-            res.render('error', { message: 'No users found in MongoDB' });
-        } else {
-            console.log(users);
-            res.render('index', { allUsers: users });
-        }
+        // Try to fetch all documents from 'users' collection.
+        const users = await userCollection.find({}).toArray();
+        
+        // Logging the output to debug.
+        console.log("Fetched users:", users);
+        
+        // If users is an empty array, it means no users are found in the database.
+        // It doesn't necessarily indicate a failure.
+        res.render('index', { allUsers: users });
     } catch (ex) {
-        console.error("Error connecting to MongoDB", ex);
-        res.render('error', { message: 'Error connecting to MongoDB' });
+        // Logging the error to the console.
+        console.error("Error fetching from MongoDB", ex);
+        res.render('error', { message: 'Error fetching from MongoDB' });
     }
 });
 
-router.get('/pets', async (req, res) => {
-	console.log("page hit");
+
+
+
+// router.get('/pets', async (req, res) => {
+// 	console.log("page hit");
 
 	
-	try {
-		const petCollection = database.db('lab_example').collection(pets);
-		const pets = await petCollection.find({ "_id": ObjectId("606e98ba4526b5d688a88c0f") })
-		const validationResult = schema.validate(req.query.id);
-		if (validationResult.error != null) {
-			console.log(validationResult.error);
-			throw validationResult.error;
-		}
-		console.log(pets);
-		res.render('pets', { allPets: pets });
-	}
+// 	try {
+// 		const petCollection = database.db('lab_example').collection(pets);
+// 		const pets = await petCollection.find({ "_id": ObjectId("606e98ba4526b5d688a88c0f") })
+// 		const validationResult = schema.validate(req.query.id);
+// 		if (validationResult.error != null) {
+// 			console.log(validationResult.error);
+// 			throw validationResult.error;
+// 		}
+// 		console.log(pets);
+// 		res.render('pets', { allPets: pets });
+// 	}
 
-	catch (ex) {
-		res.render('error', { message: 'Error connecting to MongoDB' });
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
-	}
-});
+// 	catch (ex) {
+// 		res.render('error', { message: 'Error connecting to MongoDB' });
+// 		console.log("Error connecting to MongoDB");
+// 		console.log(ex);
+// 	}
+// });
 
 
 
-router.get('/showPets', async (req, res) => {
-	console.log("page hit");
-	try {
-		let userId = req.query.id;
-		const user = await userModel.findByPk(userId);
-		if (user === null) {
-			res.render('error', { message: 'Error connecting to MongoDB' });
-			console.log("Error connecting to userModel");
-		}
-		else {
-			let pets = await user.getPets();
-			console.log(pets);
-			let owner = await pets[0].getOwner();
-			console.log(owner);
+// router.get('/showPets', async (req, res) => {
+// 	console.log("page hit");
+// 	try {
+// 		let userId = req.query.id;
+// 		const user = await userModel.findByPk(userId);
+// 		if (user === null) {
+// 			res.render('error', { message: 'Error connecting to MongoDB' });
+// 			console.log("Error connecting to userModel");
+// 		}
+// 		else {
+// 			let pets = await user.getPets();
+// 			console.log(pets);
+// 			let owner = await pets[0].getOwner();
+// 			console.log(owner);
 
-			res.render('pets', { allPets: pets });
-		}
-	}
-	catch (ex) {
-		res.render('error', { message: 'Error connecting to MongoDB' });
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
-	}
-});
+// 			res.render('pets', { allPets: pets });
+// 		}
+// 	}
+// 	catch (ex) {
+// 		res.render('error', { message: 'Error connecting to MongoDB' });
+// 		console.log("Error connecting to MongoDB");
+// 		console.log(ex);
+// 	}
+// });
 
 router.get('/deleteUser', async (req, res) => {
 	try {
@@ -105,7 +101,7 @@ router.get('/deleteUser', async (req, res) => {
 			// Convert string ID to a MongoDB ObjectId
 			const objectId = new ObjectId(userId);
 			// Delete the user with the given ObjectId
-			const result = await database.db('cluster0').collection('users').deleteOne({ _id: objectId });
+			const result = await database.db('lab_example').collection('users').deleteOne({ _id: objectId });
 			console.log("deleteUser result: ", result);
 		}
 		res.redirect("/");
@@ -134,7 +130,7 @@ router.post('/addUser', async (req, res) => {
 		};
 
 		// Insert the new user into the MongoDB collection
-		const result = await database.db('yourDatabaseName').collection('users').insertOne(newUser);
+		const result = await database.db('lab_example').collection('users').insertOne(newUser);
 		console.log("addUser result: ", result);
 		res.redirect("/");
 	}
